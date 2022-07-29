@@ -15,12 +15,14 @@ const defaultCode =
 
 export default function Home() {
   const router = useRouter()
-  const code = useMemo(
-    () => Base64.decode((router.query['code'] as string | undefined) || ''),
-    [router.query],
-  )
+  const code = useMemo(() => {
+    if (router.isReady) {
+      return Base64.decode(
+        (router.query['code'] as string).split(' ').join('+'),
+      )
+    }
+  }, [router.isReady, router.query])
   const [text, setText] = useState<string | undefined>(code || defaultCode)
-  const encoded = useMemo(() => Base64.encode(text || ''), [text])
   useEffect(() => {
     if (code) setText(code)
   }, [code])
@@ -29,7 +31,7 @@ export default function Home() {
     <div className="h-screen bg-gray-200 pt-10">
       <h1 className="text-center text-4xl">エディタサンプル</h1>
       <CopyToClipboard
-        text={`${BASE_URL}?code=${encoded}`}
+        text={`${BASE_URL}?code=${Base64.encode(text || '')}`}
         onCopy={() => alert('コピーしました')}
       >
         <button className="ml-40 block rounded-lg bg-sky-600 p-2 text-white hover:opacity-70">
