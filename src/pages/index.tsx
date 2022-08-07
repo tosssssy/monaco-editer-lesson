@@ -16,7 +16,7 @@ const defaultCode =
 export default function Home() {
   const router = useRouter()
   const code = useMemo(() => {
-    if (router.isReady) {
+    if (router.isReady && router.query['code']) {
       return Base64.decode(
         (router.query['code'] as string).split(' ').join('+'),
       )
